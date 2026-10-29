@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title description">
+  <title id="title">Local PDF RAG Assistant Architecture and Data Flow</title>
+  <desc id="description">Diagram of PDF ingestion into a locally persisted FAISS index and question-answering through retrieval and Ollama.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#52657a"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#2878c7"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#25855a"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172b4d; }
+      .title { font-size: 34px; font-weight: 700; }
+      .subtitle { font-size: 17px; fill: #52657a; }
+      .lane-title { font-size: 20px; font-weight: 700; }
+      .box-title { font-size: 17px; font-weight: 700; }
+      .box-copy { font-size: 14px; fill: #40546b; }
+      .edge-label { font-size: 13px; font-weight: 600; fill: #40546b; }
+      .note { font-size: 14px; fill: #52657a; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#f5f8fc"/>
+  <text x="800" y="58" text-anchor="middle" class="title">Local PDF RAG Assistant</text>
+  <text x="800" y="88" text-anchor="middle" class="subtitle">Architecture and labeled data flow · Python CLI · local models and storage</text>
+
+  <rect x="38" y="118" width="1524" height="415" rx="18" fill="#ffffff" stroke="#d7e1ed" stroke-width="2"/>
+  <rect x="38" y="118" width="1524" height="48" rx="18" fill="#eaf3fc"/>
+  <path d="M38 148 H1562 V166 H38 Z" fill="#eaf3fc"/>
+  <text x="66" y="149" class="lane-title" fill="#1e5d94">1 · OFFLINE INGESTION &amp; INDEX BUILD</text>
+
+  <rect x="65" y="245" width="185" height="112" rx="14" fill="#f0f7ff" stroke="#8bbbe8" stroke-width="2"/>
+  <text x="157" y="280" text-anchor="middle" class="box-title">PDF documents</text>
+  <text x="157" y="306" text-anchor="middle" class="box-copy">data/*.pdf</text>
+  <text x="157" y="329" text-anchor="middle" class="box-copy">source file + page</text>
+
+  <rect x="315" y="245" width="195" height="112" rx="14" fill="#f0f7ff" stroke="#8bbbe8" stroke-width="2"/>
+  <text x="412" y="280" text-anchor="middle" class="box-title">PDF loader</text>
+  <text x="412" y="306" text-anchor="middle" class="box-copy">PyPDFLoader</text>
+  <text x="412" y="329" text-anchor="middle" class="box-copy">extract text per page</text>
+
+  <rect x="575" y="245" width="195" height="112" rx="14" fill="#f0f7ff" stroke="#8bbbe8" stroke-width="2"/>
+  <text x="672" y="280" text-anchor="middle" class="box-title">Chunker</text>
+  <text x="672" y="306" text-anchor="middle" class="box-copy">Recursive splitter</text>
+  <text x="672" y="329" text-anchor="middle" class="box-copy">800 chars · 100 overlap*</text>
+
+  <rect x="835" y="245" width="210" height="112" rx="14" fill="#effaf5" stroke="#7fc5a1" stroke-width="2"/>
+  <text x="940" y="280" text-anchor="middle" class="box-title">Hugging Face</text>
+  <text x="940" y="306" text-anchor="middle" class="box-copy">all-MiniLM-L6-v2</text>
+  <text x="940" y="329" text-anchor="middle" class="box-copy">text chunks → vectors</text>
+
+  <rect x="1110" y="245" width="190" height="112" rx="14" fill="#fff8e9" stroke="#e5bd68" stroke-width="2"/>
+  <text x="1205" y="280" text-anchor="middle" class="box-title">FAISS index</text>
+  <text x="1205" y="306" text-anchor="middle" class="box-copy">vectors + metadata</text>
+  <text x="1205" y="329" text-anchor="middle" class="box-copy">similarity search</text>
+
+  <rect x="1360" y="245" width="170" height="112" rx="14" fill="#fff8e9" stroke="#e5bd68" stroke-width="2"/>
+  <text x="1445" y="280" text-anchor="middle" class="box-title">Disk storage</text>
+  <text x="1445" y="306" text-anchor="middle" class="box-copy">faiss_index/</text>
+  <text x="1445" y="329" text-anchor="middle" class="box-copy">index.faiss + .pkl</text>
+
+  <line x1="250" y1="301" x2="305" y2="301" stroke="#52657a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="278" y="286" text-anchor="middle" class="edge-label">PDF files</text>
+  <line x1="510" y1="301" x2="565" y2="301" stroke="#52657a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="538" y="286" text-anchor="middle" class="edge-label">page text</text>
+  <line x1="770" y1="301" x2="825" y2="301" stroke="#52657a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="798" y="286" text-anchor="middle" class="edge-label">text chunks</text>
+  <line x1="1045" y1="301" x2="1100" y2="301" stroke="#52657a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="1073" y="286" text-anchor="middle" class="edge-label">embeddings</text>
+  <line x1="1300" y1="301" x2="1350" y2="301" stroke="#52657a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="1325" y="286" text-anchor="middle" class="edge-label">save</text>
+
+  <rect x="65" y="415" width="300" height="70" rx="12" fill="#f6f1ff" stroke="#b19be0" stroke-width="2"/>
+  <text x="215" y="444" text-anchor="middle" class="box-title">Configuration (.env)</text>
+  <text x="215" y="467" text-anchor="middle" class="box-copy">paths · chunk size · model · TOP_K</text>
+  <line x1="215" y1="405" x2="215" y2="367" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="229" y="394" class="edge-label">settings</text>
+
+  <rect x="405" y="415" width="515" height="70" rx="12" fill="#f7f9fc" stroke="#d0dbe7" stroke-width="2"/>
+  <text x="662" y="445" text-anchor="middle" class="box-title">Build on first run or with --rebuild</text>
+  <text x="662" y="468" text-anchor="middle" class="box-copy">Otherwise the saved local index is reused; no PDF reprocessing.</text>
+  <line x1="1205" y1="367" x2="1205" y2="400" stroke="#25855a" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <path d="M1205 400 H921" fill="none" stroke="#25855a" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="1070" y="394" text-anchor="middle" class="edge-label">load saved index on later runs</text>
+
+  <rect x="38" y="562" width="1524" height="380" rx="18" fill="#ffffff" stroke="#d7e1ed" stroke-width="2"/>
+  <rect x="38" y="562" width="1524" height="48" rx="18" fill="#edf8f2"/>
+  <path d="M38 592 H1562 V610 H38 Z" fill="#edf8f2"/>
+  <text x="66" y="593" class="lane-title" fill="#23734e">2 · QUESTION &amp; ANSWER (RUNTIME)</text>
+
+  <rect x="70" y="710" width="205" height="112" rx="14" fill="#f6f1ff" stroke="#b19be0" stroke-width="2"/>
+  <text x="172" y="745" text-anchor="middle" class="box-title">User / CLI</text>
+  <text x="172" y="771" text-anchor="middle" class="box-copy">python -m src.main</text>
+  <text x="172" y="794" text-anchor="middle" class="box-copy">question</text>
+
+  <rect x="365" y="710" width="220" height="112" rx="14" fill="#f0f7ff" stroke="#8bbbe8" stroke-width="2"/>
+  <text x="475" y="745" text-anchor="middle" class="box-title">Question embedding</text>
+  <text x="475" y="771" text-anchor="middle" class="box-copy">same Hugging Face model</text>
+  <text x="475" y="794" text-anchor="middle" class="box-copy">question → vector</text>
+
+  <rect x="675" y="710" width="230" height="112" rx="14" fill="#fff8e9" stroke="#e5bd68" stroke-width="2"/>
+  <text x="790" y="745" text-anchor="middle" class="box-title">FAISS retrieval</text>
+  <text x="790" y="771" text-anchor="middle" class="box-copy">top-k nearest chunks</text>
+  <text x="790" y="794" text-anchor="middle" class="box-copy">text + source/page metadata</text>
+
+  <rect x="995" y="710" width="230" height="112" rx="14" fill="#effaf5" stroke="#7fc5a1" stroke-width="2"/>
+  <text x="1110" y="745" text-anchor="middle" class="box-title">Prompt + Ollama</text>
+  <text x="1110" y="771" text-anchor="middle" class="box-copy">question + retrieved context</text>
+  <text x="1110" y="794" text-anchor="middle" class="box-copy">local model · llama3.2</text>
+
+  <rect x="1315" y="710" width="215" height="112" rx="14" fill="#f0f7ff" stroke="#8bbbe8" stroke-width="2"/>
+  <text x="1422" y="745" text-anchor="middle" class="box-title">Answer + sources</text>
+  <text x="1422" y="771" text-anchor="middle" class="box-copy">short grounded response</text>
+  <text x="1422" y="794" text-anchor="middle" class="box-copy">filename · page number</text>
+
+  <line x1="275" y1="766" x2="355" y2="766" stroke="#2878c7" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="315" y="750" text-anchor="middle" class="edge-label">question</text>
+  <line x1="585" y1="766" x2="665" y2="766" stroke="#2878c7" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="625" y="750" text-anchor="middle" class="edge-label">query vector</text>
+  <line x1="905" y1="766" x2="985" y2="766" stroke="#2878c7" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="945" y="750" text-anchor="middle" class="edge-label">top-k context</text>
+  <line x1="1225" y1="766" x2="1305" y2="766" stroke="#2878c7" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <text x="1265" y="750" text-anchor="middle" class="edge-label">generated answer</text>
+
+  <path d="M1205 357 V665 H790 V700" fill="none" stroke="#25855a" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="1000" y="652" text-anchor="middle" class="edge-label" fill="#23734e">load index into vector store for search</text>
+
+  <rect x="365" y="855" width="860" height="52" rx="12" fill="#f7f9fc" stroke="#d0dbe7" stroke-width="2"/>
+  <text x="795" y="878" text-anchor="middle" class="box-copy">If retrieved context lacks the answer, return: “I don't know based on the provided documents.”</text>
+  <text x="795" y="897" text-anchor="middle" class="note">* Chunking and retrieval values are configurable in .env.</text>
+</svg>
