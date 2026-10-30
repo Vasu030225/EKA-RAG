@@ -1,6 +1,6 @@
-# Local PDF RAG Assistant
+# Enterprise Knowledge Assistant (RAG) POC: Local PDF RAG Assistant
 
-A small, local document question-answering app. It uses Hugging Face embeddings to search PDF text with FAISS and Ollama to generate short answers with source citations. No paid API keys are needed.
+A document Q&A assistant built with LangChain. It uses Hugging Face embeddings to search PDF text with FAISS and Ollama to generate short answers with source citations. No paid API keys are needed.
 
 ## Architecture and data flow
 
@@ -94,6 +94,7 @@ Settings are loaded from `.env`. Relative paths are resolved from the project di
 | `DATA_DIR` | `./data` | Directory scanned for PDF files. |
 | `INDEX_DIR` | `./faiss_index` | Directory used to save and load the FAISS index. |
 | `EMBEDDING_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Hugging Face model used to embed chunks and questions. |
+| `HF_TOKEN` | *(unset)* | Optional Hugging Face access token, used for gated or private models. |
 | `CHUNK_SIZE` | `800` | Maximum chunk length in characters. |
 | `CHUNK_OVERLAP` | `100` | Shared characters between adjacent chunks. |
 | `TOP_K` | `4` | Number of closest chunks provided to the LLM. |
@@ -115,6 +116,7 @@ Settings are loaded from `.env`. Relative paths are resolved from the project di
 - **Connection refused:** Start Ollama with `ollama serve`, and confirm `OLLAMA_BASE_URL` points to the local server.
 - **Model not found:** Download the configured model, for example `ollama pull llama3.2`; check `OLLAMA_MODEL` if you use another model.
 - **First run is slow:** The Hugging Face embedding model downloads once, and the initial run builds the FAISS index.
+- **Gated Hugging Face model:** Set `HF_TOKEN` in `.env` to a Hugging Face access token with permission to access the model.
 - **No PDFs found:** Add `.pdf` files under the configured `DATA_DIR` and rebuild.
 - **Empty or unhelpful answers:** Check that the PDF contains extractable text and that it covers the question. Use `--show-chunks` to inspect retrieved passages.
 - **Embedding model changed:** Delete the local `faiss_index/` folder and run with `--rebuild`; vectors made by different embedding models cannot be mixed.

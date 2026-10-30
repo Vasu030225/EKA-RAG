@@ -16,7 +16,11 @@ logger = logging.getLogger(__name__)
 
 def _create_embeddings(settings: Settings) -> HuggingFaceEmbeddings:
     """Initialize the configured local Hugging Face embedding model."""
-    return HuggingFaceEmbeddings(model_name=settings.embedding_model)
+    model_kwargs = {"token": settings.hf_token} if settings.hf_token else {}
+    return HuggingFaceEmbeddings(
+        model_name=settings.embedding_model,
+        model_kwargs=model_kwargs,
+    )
 
 
 def index_exists(index_dir: Path) -> bool:

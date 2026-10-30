@@ -16,6 +16,7 @@ class Settings:
     data_dir: Path
     index_dir: Path
     embedding_model: str
+    hf_token: str | None
     chunk_size: int
     chunk_overlap: int
     top_k: int
@@ -57,6 +58,7 @@ def load_settings() -> Settings:
         embedding_model=os.getenv(
             "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
         ),
+        hf_token=os.getenv("HF_TOKEN") or None,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         top_k=top_k,
