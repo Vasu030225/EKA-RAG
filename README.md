@@ -71,6 +71,30 @@ Combine options as needed:
 python -m src.main --rebuild --question "How many days of annual leave do I get?" --show-chunks
 ```
 
+## Regression tests and performance evaluation
+
+Run the offline unit tests (the Ollama model is mocked):
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+Run live end-to-end checks against the PDFs in `DATA_DIR` and the configured local Ollama model:
+
+```powershell
+python -m scripts.evaluate_poc
+```
+
+The evaluation tests annual-leave entitlement and carry-forward, work-from-home allowance, password length, and the exact fallback for an unsupported question. It checks expected answer terms and cited pages, and records FAISS build/load time and repeated question latency in `reports/evaluation_report.md`. It builds a temporary index and does not replace the application's saved index.
+
+The report estimates electricity cost from the configured device wattage and INR/kWh rate; these defaults are assumptions, not wall-power measurements. Local Ollama inference has no hosted API charge, but local electricity, hardware, model storage, and model downloads are not free. To compare with your own hosted API rate, provide it explicitly:
+
+```powershell
+python -m scripts.evaluate_poc --repeats 3 --power-watts 100 --electricity-rate-inr-per-kwh 8 --cloud-cost-per-1000-requests-inr 50
+```
+
+Adjust the wattage, electricity rate, and cloud rate to your actual environment. A cloud comparison is omitted unless a rate is supplied.
+
 ### Example questions
 
 - How many days of annual leave do I get?
